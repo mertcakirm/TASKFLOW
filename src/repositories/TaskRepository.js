@@ -1,3 +1,5 @@
+const BaseRepository = require("./baseRepository");
+
 class TaskRepository extends BaseRepository {
     constructor(model) {
         super(model);

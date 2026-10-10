@@ -27,6 +27,10 @@ class BaseRepository {
     await record.destroy();
     return true;
   }
+
+  async findAndCountAll(options = {}) {
+    return await this.model.findAndCountAll(options);
+  }
 }
 
 module.exports = BaseRepository;

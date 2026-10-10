@@ -1,5 +1,5 @@
-const BaseRepository = require('./BaseRepository');
 const { Project, User } = require('../../context/database');
+const BaseRepository = require('./baseRepository');
 
 class ProjectRepository extends BaseRepository {
   constructor() {
@@ -19,4 +19,4 @@ class ProjectRepository extends BaseRepository {
   }
 }
 
-module.exports = new ProjectRepository();
+module.exports = ProjectRepository;
