@@ -7,7 +7,7 @@ app.use(cors(corsOptions));
 app.use(express.json());  
 
 app.use("/api/auth", require("./routes/AuthRoute"));
-//app.use("/api/users", require("./routes/UserRoutes"));
+app.use("/api/users", require("./routes/UserRoute"));
 app.use("/api/projects", require("./routes/ProjectRoute"));
 app.use("/api/tasks", require("./routes/TaskRoute"));
 

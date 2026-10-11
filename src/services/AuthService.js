@@ -7,8 +7,7 @@ class AuthService {
     this.userRepository = userRepository;
   }
 
-  async register({ email, password, name }) {
-    // 1. Email kullanımda mı kontrol et
+async register({ email, password, name }) {
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       const error = new Error('Bu email adresi zaten kullanımda.');
@@ -16,22 +15,28 @@ class AuthService {
       throw error;
     }
 
-    // 2. Şifreyi hashle
+    // 2. Sistemdeki toplam kullanıcı sayısının kontrol  (İlk kullanıcı mı?)
+    const userCount = await this.userRepository.model.count();
+
+    // 3. Rol belirleme: Eğer hiç kullanıcı yoksa ilk kullanıcı Manager olur
+    let assignedRole = ROLES ? ROLES.USER : 'user';
+    if (userCount === 0) {
+      assignedRole = ROLES && ROLES.MANAGER ? ROLES.MANAGER : 'manager';
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Yeni kullanıcıyı oluştur (Varsayılan rol: user)
     const newUser = await this.userRepository.create({
       email,
       password: hashedPassword,
       name,
-      role: ROLES ? ROLES.USER : 'user',
+      role: assignedRole,
     });
 
     return this.buildAuthResponse(newUser);
   }
 
   async login({ email, password }) {
-    // 1. Kullanıcıyı email ile bul
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       const error = new Error('Geçersiz email veya şifre.');
@@ -79,7 +84,6 @@ class AuthService {
     return { message: 'Şifre başarıyla güncellendi.' };
   }
 
-  // RESPONSE BUILDER
   buildAuthResponse(user) {
     const token = signToken({ id: user.id, role: user.role });
     return {
