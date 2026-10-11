@@ -1,8 +1,9 @@
 const BaseRepository = require("./baseRepository");
+const { Task } = require("../context/context");
 
 class TaskRepository extends BaseRepository {
-    constructor(model) {
-        super(model);
+    constructor() {
+        super(Task);
     }
 
     async findByStatus(status, options = {}) {

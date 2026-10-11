@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 class ProjectService {
   constructor(projectRepository) {
     this.projectRepository = projectRepository;
@@ -5,24 +7,41 @@ class ProjectService {
 
   // 1. Tüm projeleri sayfalama (pagination) ve sıralama desteğiyle getir
   async getAllProjects(queryParams = {}) {
-    const page = parseInt(queryParams.page, 10) || 1;
-    const limit = parseInt(queryParams.limit, 10) || 10;
+    const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+    const limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
     const offset = (page - 1) * limit;
 
     const sortBy = queryParams.sortBy || 'createdAt';
-    const sortOrder = queryParams.sortOrder ? queryParams.sortOrder.toUpperCase() : 'DESC';
+    const sortOrder = queryParams.sortOrder && queryParams.sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const where = {};
+
+    if (queryParams.status) {
+      where.status = queryParams.status;
+    }
+
+    if (queryParams.search) {
+      const searchTerm = `%${queryParams.search}%`;
+      
+      where[Op.or] = [
+        { name: { [Op.like]: searchTerm } }, 
+        { description: { [Op.like]: searchTerm } }
+      ];
+    }
 
     const options = {
+      where,
       limit,
       offset,
       order: [[sortBy, sortOrder]]
     };
 
     const { count, rows } = await this.projectRepository.model.findAndCountAll(options);
+    const totalPages = Math.ceil(count / limit) || 1;
 
     return {
       totalItems: count,
-      totalPages: Math.ceil(count / limit),
+      totalPages: totalPages,
       currentPage: page,
       projects: rows
     };
@@ -92,8 +111,15 @@ class ProjectService {
     const limit = parseInt(queryParams.limit, 10) || 10;
     const offset = (page - 1) * limit;
 
+
+    const where = { ownerId };
+
+    if (queryParams.status) {
+      where.status = queryParams.status;
+    }
+    
     const options = {
-      where: { ownerId },
+      where,
       limit,
       offset,
       order: [['createdAt', 'DESC']]

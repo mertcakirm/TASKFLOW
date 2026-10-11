@@ -2,8 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const corsOptions = require('./config/cors');
+const requestLogger = require('./middlewares/logger');
 
-app.use(cors(corsOptions));          
+app.use(cors(corsOptions)); 
+app.use(requestLogger);         
 app.use(express.json());  
 
 app.use("/api/auth", require("./routes/AuthRoute"));

@@ -44,7 +44,7 @@ class TaskController {
   // 3. Yeni görev oluştur
   async createTask(req, res) {
     try {
-      const userId = req.user.id; // Auth middleware'den gelen kullanıcı ID'si
+      const userId = req.user.id;
       const newTask = await taskService.createTask(req.body, userId);
       
       return res.status(201).json({

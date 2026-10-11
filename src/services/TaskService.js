@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Project, User } = require('../context/context');
 
 class TaskService {
@@ -5,20 +6,40 @@ class TaskService {
     this.taskRepository = taskRepository;
   }
 
+
   async getAllTasks(queryParams = {}) {
-    const page = parseInt(queryParams.page, 10) || 1;
-    const limit = parseInt(queryParams.limit, 10) || 10;
+    const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+    const limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
     const offset = (page - 1) * limit;
 
     const sortBy = queryParams.sortBy || 'createdAt';
-    const sortOrder = queryParams.sortOrder ? queryParams.sortOrder.toUpperCase() : 'DESC';
+    const sortOrder = queryParams.sortOrder && queryParams.sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const where = {};
+
+    // Durum filtresi
     if (queryParams.status) {
       where.status = queryParams.status;
     }
+    
+    // Öncelik filtresi
     if (queryParams.priority) {
       where.priority = queryParams.priority;
+    }
+
+    // Kişiye (Assignee) göre filtreleme 
+    if (queryParams.assigneeId) {
+      where.assigneeId = queryParams.assigneeId;
+    }
+
+    // Arama filtresi 
+    if (queryParams.search) {
+      const searchTerm = `%${queryParams.search}%`;
+      
+      where[Op.or] = [
+        { title: { [Op.like]: searchTerm } },
+        { description: { [Op.like]: searchTerm } }
+      ];
     }
 
     const options = {
@@ -32,13 +53,21 @@ class TaskService {
       ]
     };
 
-    const { count, rows } = await this.taskRepository.model.findAndCountAll(options);
+    const { count, rows } = await this.taskRepository.findAndCountAll(options);
+
+    const totalPages = Math.ceil(count / limit) || 1;
 
     return {
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      tasks: rows
+      data: rows,
+      pagination: {
+        totalItems: count,
+        itemCount: rows.length,
+        itemsPerPage: limit,
+        totalPages: totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
     };
   }
 
@@ -121,12 +150,18 @@ class TaskService {
       throw error;
     }
 
-    const page = parseInt(queryParams.page, 10) || 1;
-    const limit = parseInt(queryParams.limit, 10) || 10;
+    const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+    const limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
     const offset = (page - 1) * limit;
 
+    const where = { projectId };
+
+    if (queryParams.status) {
+      where.status = queryParams.status;
+    }
+
     const options = {
-      where: { projectId },
+      where,
       limit,
       offset,
       order: [['createdAt', 'DESC']],
@@ -136,10 +171,11 @@ class TaskService {
     };
 
     const { count, rows } = await this.taskRepository.model.findAndCountAll(options);
+    const totalPages = Math.ceil(count / limit) || 1;
 
     return {
       totalItems: count,
-      totalPages: Math.ceil(count / limit),
+      totalPages: totalPages,
       currentPage: page,
       tasks: rows
     };
