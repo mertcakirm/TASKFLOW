@@ -30,9 +30,9 @@ const requireRole = (...roles) => {
       return res.status(401).json({ message: 'Yetkilendirme başarısız: Kullanıcı bulunamadı.' });
     }
 
-    const userRole = req.user.roleName ? req.user.roleName.toLowerCase() : '';
+    const userRole = req.user.role ? req.user.role.toLowerCase() : '';
     const normalizedRoles = roles.map(role => role.toLowerCase());
-
+    
     if (!normalizedRoles.includes(userRole)) {
       return res.status(403).json({ message: 'Erişim yetkiniz bulunmamaktadır.' });
     }

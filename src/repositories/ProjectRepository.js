@@ -1,4 +1,4 @@
-const { Project, User } = require('../../context/database');
+const { Project, User } = require('../context/context');
 const BaseRepository = require('./baseRepository');
 
 class ProjectRepository extends BaseRepository {

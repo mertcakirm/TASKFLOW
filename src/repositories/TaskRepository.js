@@ -13,8 +13,6 @@ class TaskRepository extends BaseRepository {
         return await this.model.findAll({ where: { priority }, ...options });
     }
 
-
-    
 }
 
 module.exports = TaskRepository;

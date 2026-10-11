@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.use("/api/auth", require("./routes/AuthRoute"));
 //app.use("/api/users", require("./routes/UserRoutes"));
-// app.use("/api/projects", require("./routes/ProjectRoutes"));
-// app.use("/api/tasks", require("./routes/TaskRoutes"));
+app.use("/api/projects", require("./routes/ProjectRoute"));
+app.use("/api/tasks", require("./routes/TaskRoute"));
 
 module.exports = app;

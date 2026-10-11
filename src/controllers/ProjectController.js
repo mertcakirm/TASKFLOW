@@ -40,7 +40,6 @@ class ProjectController {
   // 3. Yeni proje oluştur
   async createProject(req, res) {
     try {
-      // Not: req.user, auth/JWT middleware tarafından eklenmiş olmalıdır
       const userId = req.user.id; 
       const newProject = await projectService.createProject(req.body, userId);
       
