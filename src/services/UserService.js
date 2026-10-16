@@ -8,6 +8,10 @@ class UserService {
 
   async changeRole(managerId ,userId, newRole) {
     const user = await this.userRepository.findById(userId);
+    console.log(managerId);
+    console.log(userId);
+    console.log(newRole);
+    
     if (!user) {
       const error = new Error('Kullanıcı bulunamadı.');
       error.statusCode = 404;
@@ -20,7 +24,7 @@ class UserService {
       throw error;
     }
 
-    if(managerId === userId) {
+    if (String(managerId) === String(userId)) {
       const error = new Error('Kendi rolünüzü değiştiremezsiniz.');
       error.statusCode = 403;
       throw error;

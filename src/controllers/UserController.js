@@ -4,16 +4,12 @@ const _context = require('../context/context');
 
 class UserController {
     
-    constructor(userService) {
-        this.userService = userService;
-    }
-
     async changeRole(req, res) {
         try {
             const managerId = req.user.id;
             const { userId, newRole } = req.body;
-
-            const updatedUser = await this.userService.changeRole(managerId, userId, newRole);
+            
+            const updatedUser = await userService.changeRole(managerId, userId, newRole);
 
             return res.status(200).json({
                 success: true,
@@ -28,13 +24,12 @@ class UserController {
         }
     }
 
-
     async deleteUser(req, res) {
         try {
             const managerId = req.user.id;
             const { userId } = req.params;
 
-            await this.userService.deleteUser(managerId, userId);
+            await userService.deleteUser(managerId, userId);
 
             return res.status(200).json({
                 success: true,
