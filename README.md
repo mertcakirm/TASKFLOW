@@ -73,16 +73,16 @@
    JWT_SECRET=your_secret_key
 ```
 
-5. Sunucuyu başlatın:
+5. Sunucuyu çalıştırın:
 
 ```bash
-   npm start
+   npm start / node server.js
 ```
 
    Geliştirme modunda (otomatik yeniden başlatma):
 
 ```bash
-   npm run dev
+   npm run dev / nodemon server.js
 ```
 
 ## 📜 Kullanılabilir Komutlar
